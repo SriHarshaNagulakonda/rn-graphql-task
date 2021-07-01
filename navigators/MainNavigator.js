@@ -9,7 +9,7 @@ import {
 
 const AuthNavigator = createStackNavigator(
     {
-      Login: LoginScreen,
+      // Login: LoginScreen,
       Verify: VerifyScreen,
     },
     {
