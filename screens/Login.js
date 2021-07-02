@@ -81,7 +81,7 @@ const Login = (props) => {
     })
       .then((data) => {
         console.log("otp sent");
-        console.log(data, "send otp data");
+        // console.log(data, "send otp data");
         setTimeout(() => {
           setShowOTPView(true);
           setSnackBarVisible(true);
@@ -114,11 +114,10 @@ const Login = (props) => {
       variables: { otp, phone },
     })
       .then(async (data) => {
-        console.log(data, "verify otp dataa");
+        console.log('otp verified');
+        // console.log(data, "verify otp dataa");
         // makeApolloClient(data['access_token']);
         await AsyncStorage.setItem("user_object", JSON.stringify(data));
-        // const dta = await AsyncStorage.getItem("user_object");
-        // props.navigation.navigate('Verify');
         props.fun();
       })
       .catch((err) => {

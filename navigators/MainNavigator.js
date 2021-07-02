@@ -1,5 +1,5 @@
 import LoginScreen from '../screens/Login'
-import VerifyScreen from '../screens/Verify'
+import HomeScreen from '../screens/Home'
 
 import {
     createSwitchNavigator,
@@ -10,7 +10,7 @@ import {
 const AuthNavigator = createStackNavigator(
     {
       // Login: LoginScreen,
-      Verify: VerifyScreen,
+      Home: HomeScreen,
     },
     {
         navigationOptions:{
