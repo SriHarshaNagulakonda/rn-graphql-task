@@ -59,12 +59,8 @@ const Home = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [reRenderProducts, setReRenderProducts] = useState(false);
-  const [snackBarVisible, setSnackBarVisible] = useState(false);
-  const [snackBarText, setSnackBarText] = useState("");
-  const [latestCartChangedId, setLatestCartChangedId] = useState();
   const [cartProducts, setCartProducts] = useState([]);
 
-  const onDismissSnackBar = () => setSnackBarVisible(false);
 
 
   var products = [];
@@ -88,15 +84,16 @@ const Home = () => {
           }
         }
         setCartProducts(cart_products)
-        setCartItems(user_cart);
+        // setCartItems(user_cart);
     } else {
       
     }
   };
 
   useEffect(() => {
+      console.log('cart opened')
     fetchCart();
-  }, [loading]);
+  }, []);
 
   if (loading) {
     console.log(loading, "loading");
@@ -108,36 +105,6 @@ const Home = () => {
     products = data.get_products_delta.products;
     // products = [products[5]];
   }
-
-  const addToCart = (id) => {
-    setLatestCartChangedId(id);
-    setSnackBarVisible(true);
-    setTimeout(() => {
-      setSnackBarVisible(false);
-    }, 3000);
-    if(cartItems[id]==0){
-      setCartItems((prev) => {
-        prev[id] = 1;
-        return prev;
-      });
-      setSnackBarText("Added to Cart");
-    }
-    else{
-      setCartItems((prev) => {
-        prev[id] = 0;
-        return prev;
-      });
-      setSnackBarText("Removed from Cart");
-      // setReRenderProducts(!reRenderProducts)
-    }
-    console.log(cartItems[id]);
-    setReRenderProducts(!reRenderProducts)
-
-    AsyncStorage.setItem(
-      "initial_cart",
-      JSON.stringify(cartItems)
-    );
-  };
 
   return (
     <View>
@@ -161,48 +128,9 @@ const Home = () => {
               // selectItemHandler(itemData.item.id, itemData.item.title);
             }}
           >
-            {/* <Entypo name="shopping-cart" size={25} color={Colors.primary} /> */}
-            <View style={{ flexDirection: "row", right: 5 }}>
-              {cartItems[itemData.item.id] == 0 ? (
-                <EvilIcons
-                  name="cart"
-                  size={40}
-                  color={Colors.primary}
-                  onPress={() => addToCart(itemData.item.id)}
-                />
-              ) : (
-                <Entypo name="shopping-cart" size={32} onPress={() => addToCart(itemData.item.id)} color={Colors.primary} />
-              )}
-              <MaterialIcons
-                name="favorite-outline"
-                size={30}
-                color={Colors.red}
-              />
-            </View>
-            {/* <MaterialIcons name="favorite" size={24} color={Colors.red} /> */}
           </ProductItem>
         )}
       />
-    <Snackbar
-        visible={snackBarVisible}
-        onDismiss={onDismissSnackBar}
-        action={{
-          label: "Dissmiss",
-          onPress: onDismissSnackBar,
-        },
-        {
-          label: "UNDO",
-          onPress: () => setTimeout(() => {
-              setSnackBarVisible(false);
-              addToCart(latestCartChangedId)
-            },1500),
-          color:"#f0ad4e"
-        }
-      }
-      >
-        {snackBarText}
-      </Snackbar>
-
     </View>
   );
 };

@@ -96,9 +96,20 @@ const Home = () => {
     }
   };
 
+
+
   useEffect(() => {
     fetchCart();
   }, [loading]);
+
+  useEffect(() => {
+    console.log('updating the async')
+    AsyncStorage.setItem(
+      "initial_cart",
+      JSON.stringify(cartItems)
+    );
+},[cartItems]);
+
 
   if (loading) {
     console.log(loading, "loading");
@@ -117,29 +128,20 @@ const Home = () => {
     setTimeout(() => {
       setSnackBarVisible(false);
     }, 3000);
+    console.log(id, cartItems[id],'added to cart');
     if(cartItems[id]==0){
-      setCartItems((prev) => {
-        prev[id] = 1;
-        return prev;
-      });
+      setCartItems({...cartItems,[id]:1});
       setSnackBarText("Added to Cart");
     }
     else{
-      setCartItems((prev) => {
-        prev[id] = 0;
-        return prev;
-      });
+      setCartItems({...cartItems,[id]:0});
       setSnackBarText("Removed from Cart");
       // setReRenderProducts(!reRenderProducts)
     }
-    console.log(cartItems[id]);
+    console.log(id, cartItems[id],'added to cart');
     setReRenderProducts(!reRenderProducts)
-
-    AsyncStorage.setItem(
-      "initial_cart",
-      JSON.stringify(cartItems)
-    );
   };
+
 
   return (
     <View>
