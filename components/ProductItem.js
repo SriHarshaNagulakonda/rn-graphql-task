@@ -8,6 +8,7 @@ import {
   TouchableNativeFeedback,
   Platform
 } from 'react-native';
+import { Rating, AirbnbRating } from 'react-native-ratings';
 
 import Card from './Card';
 
@@ -19,6 +20,7 @@ const ProductItem = props => {
   }
 
   const price = parseInt(props.price.toFixed(2));
+  const rating = props.points_rate*5;
 
   return (
     <Card style={styles.product}>
@@ -42,14 +44,32 @@ const ProductItem = props => {
                     -{" "+props.brand_name}
                   </Text>
               </Text>
-              <Text style={styles.price}>${price+"  "} 
-                <Text style={styles.striked}>
-                    ${price + price*0.2}
+              <View style={{flexDirection: 'row'}}>
+                  <Text style={styles.price}>${price+"  "} 
+                      <Text style={styles.striked}>
+                        ${price + price*0.2}
+                      </Text>
+                      {"    "}
                   </Text>
-              </Text>
+                  <View     
+                      style={{
+                          alignItems: 'flex-end',
+                          justifyContent: 'center',
+                        }}
+                      >
+                    <Rating
+                        startingValue={rating}
+                        imageSize={15}
+                        readOnly
+                      />
+                  </View>
+                  <View style={{position: 'absolute', left:'80%'}}>
+                    {props.children}
+                  </View>
+              </View>
             </View>
             <View style={styles.actions}>
-              {props.children}
+              {/* {props.children} */}
             </View>
           </View>
         </TouchableCmp>
@@ -60,7 +80,7 @@ const ProductItem = props => {
 
 const styles = StyleSheet.create({
   product: {
-    height: 350,
+    height: 300,
     margin: 20,
   },
   touchable: {
@@ -95,7 +115,8 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 20,
-    color: '#222'
+    color: '#222',
+    alignItems: 'flex-start',
   },
   striked: {
     textDecorationLine: 'line-through',

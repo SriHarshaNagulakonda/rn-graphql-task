@@ -1,21 +1,22 @@
 import LoginScreen from '../screens/Login'
 import HomeScreen from '../screens/Home'
+import Colors from "../constants/Colors";
 
 import {
     createSwitchNavigator,
     createAppContainer,
   } from 'react-navigation';
   import { createStackNavigator } from "react-navigation-stack";
+import CartScreen from '../screens/Cart'
 
 const AuthNavigator = createStackNavigator(
     {
       // Login: LoginScreen,
       Home: HomeScreen,
+      Cart: CartScreen,
     },
     {
-        navigationOptions:{
-            headerShown: false,
-        }
+        backgroundColor:Colors.primary,
     }
 );
 

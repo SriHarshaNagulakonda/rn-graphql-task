@@ -62,7 +62,7 @@ const Home = () => {
   const [snackBarVisible, setSnackBarVisible] = useState(false);
   const [snackBarText, setSnackBarText] = useState("");
   const [latestCartChangedId, setLatestCartChangedId] = useState();
-
+  const [cartProducts, setCartProducts] = useState([]);
 
   const onDismissSnackBar = () => setSnackBarVisible(false);
 
@@ -77,22 +77,20 @@ const Home = () => {
 
   const fetchCart = async () => {
     var user_cart = await AsyncStorage.getItem("initial_cart");
-    if (!user_cart) {
-      console.log("no cart items");
-      // const set = await AsyncStorage.setItem('initial_cart',JSON{})
-      const initial_cart = {};
-      for (var key in products) {
-        initial_cart[products[key]["id"]] = 0;
-      }
-      console.log(initial_cart, "initial_cart");
-      setCartItems(initial_cart);
+    
+    if (user_cart) {
+        user_cart = JSON.parse(user_cart);
+        var cart_products = [];
+        for (var key in products) {
+          if(user_cart[products[key]["id"]]==1) {
+              console.log(products[key]["id"],'id')
+              cart_products.push(products[key])
+          }
+        }
+        setCartProducts(cart_products)
+        setCartItems(user_cart);
     } else {
-      user_cart = JSON.parse(user_cart);
-      for (var key in products) {
-        if(!user_cart.hasOwnProperty(products[key]["id"]))
-          user_cart[products[key]["id"]] = 0;
-      }
-      setCartItems(user_cart);
+      
     }
   };
 
@@ -146,7 +144,7 @@ const Home = () => {
       <FlatList
         onRefresh={() => {}}
         refreshing={loading}
-        data={products}
+        data={cartProducts}
         keyExtractor={(item) => item.id}
         extraData={reRenderProducts}
         renderItem={(itemData) => (
@@ -213,15 +211,7 @@ export default Home;
 
 Home.navigationOptions = (navData) => {
     return {
-      headerTitle: 'All Products',
-      headerRight: (
-        <EvilIcons
-          name="cart"
-          size={40}
-          color="white"
-          onPress={() => navData.navigation.navigate('Cart')}
-        />
-      ),
+      headerTitle: 'CART', 
       headerTintColor: 'white',
       headerStyle: {
         backgroundColor: Colors.primary,
