@@ -63,7 +63,7 @@ const ProductItem = props => {
                         readOnly
                       />
                   </View>
-                  <View style={{position: 'absolute', left:'80%'}}>
+                  <View style={{position: 'absolute', left:'80%',...props.style}}>
                     {props.children}
                   </View>
               </View>

@@ -16,6 +16,8 @@ import { Entypo } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Snackbar } from "react-native-paper";
+import Counter from "react-native-counters";
+
 
 const FETCH_PRODUCTS = gql`
   query {
@@ -60,6 +62,7 @@ const Home = () => {
   const [cartItems, setCartItems] = useState({});
   const [reRenderProducts, setReRenderProducts] = useState(false);
   const [cartProducts, setCartProducts] = useState([]);
+  const [productQuantity, setProductQuantity] = useState({});
 
 
 
@@ -73,7 +76,7 @@ const Home = () => {
 
   const fetchCart = async () => {
     var user_cart = await AsyncStorage.getItem("initial_cart");
-    
+    var product_quantity = {}
     if (user_cart) {
         user_cart = JSON.parse(user_cart);
         var cart_products = [];
@@ -81,18 +84,23 @@ const Home = () => {
           if(user_cart[products[key]["id"]]==1) {
               console.log(products[key]["id"],'id')
               cart_products.push(products[key])
+              product_quantity[products[key]["id"]] = 1
           }
         }
         setCartProducts(cart_products)
+        console.log(product_quantity)
+        setProductQuantity(product_quantity)
         // setCartItems(user_cart);
     } else {
       
     }
+    setReRenderProducts(!reRenderProducts)
   };
 
   useEffect(() => {
       console.log('cart opened')
     fetchCart();
+    console.log(productQuantity)
   }, []);
 
   if (loading) {
@@ -119,15 +127,20 @@ const Home = () => {
             // image={itemData.item.image}
             image="https://assets.myntassets.com/h_1440,q_90,w_1080/v1/assets/images/10456354/2019/8/22/d56e75f6-f1a7-4fdd-b430-51befb36f88d1566454760527-Campus-Sutra-Men-Colourblocked-Casual-Spread-Shirt-290156645-1.jpg"
             title={itemData.item.display_name}
-            price={itemData.item.price}
+            price={productQuantity[itemData.item.id] * itemData.item.price}
             brand_name={itemData.item.brand_name}
             is_available={itemData.item.is_available}
             points_rate={itemData.item.points_rate}
             id={itemData.item.id}
+            style={{left:'65%'}}
             onSelect={() => {
               // selectItemHandler(itemData.item.id, itemData.item.title);
             }}
           >
+            <Counter start={1} min={1} max={itemData.item.max_qty}
+              onChange={(value) => {
+                setProductQuantity({...productQuantity, [itemData.item.id]:value})
+              }} />
           </ProductItem>
         )}
       />

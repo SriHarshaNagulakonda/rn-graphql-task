@@ -16,6 +16,8 @@ import { Entypo } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Snackbar } from "react-native-paper";
+import AwesomeAlert from 'react-native-awesome-alerts';
+
 
 const FETCH_PRODUCTS = gql`
   query {
@@ -62,6 +64,7 @@ const Home = () => {
   const [snackBarVisible, setSnackBarVisible] = useState(false);
   const [snackBarText, setSnackBarText] = useState("");
   const [latestCartChangedId, setLatestCartChangedId] = useState();
+  const [showAwesomeAlert, setShowAwesomeAlert] = useState(false);
 
 
   const onDismissSnackBar = () => setSnackBarVisible(false);
@@ -103,7 +106,7 @@ const Home = () => {
   }, [loading]);
 
   useEffect(() => {
-    console.log('updating the async')
+    // console.log('updating the async')
     AsyncStorage.setItem(
       "initial_cart",
       JSON.stringify(cartItems)
@@ -117,18 +120,24 @@ const Home = () => {
   }
 
   if (!loading) {
-    console.log(loading, "loading");
+    // console.log(loading, "loading");
     products = data.get_products_delta.products;
-    // products = [products[5]];
   }
 
   const addToCart = (id) => {
+    // console.log(products)
+    var product = products.filter(product => product.id === id)[0];
+    if(!product['is_available']){
+      console.log('out of stock');
+      setShowAwesomeAlert(true);
+      return;
+    }
     setLatestCartChangedId(id);
     setSnackBarVisible(true);
     setTimeout(() => {
       setSnackBarVisible(false);
     }, 3000);
-    console.log(id, cartItems[id],'added to cart');
+    // console.log(id, cartItems[id],'added to cart');
     if(cartItems[id]==0){
       setCartItems({...cartItems,[id]:1});
       setSnackBarText("Added to Cart");
@@ -138,7 +147,7 @@ const Home = () => {
       setSnackBarText("Removed from Cart");
       // setReRenderProducts(!reRenderProducts)
     }
-    console.log(id, cartItems[id],'added to cart');
+    // console.log(id, cartItems[id],'added to cart');
     setReRenderProducts(!reRenderProducts)
   };
 
@@ -206,6 +215,44 @@ const Home = () => {
       >
         {snackBarText}
       </Snackbar>
+      <Snackbar
+        visible={snackBarVisible}
+        onDismiss={onDismissSnackBar}
+        action={{
+          label: "Dissmiss",
+          onPress: onDismissSnackBar,
+        },
+        {
+          label: "UNDO",
+          onPress: () => setTimeout(() => {
+              setSnackBarVisible(false);
+              addToCart(latestCartChangedId)
+            },1500),
+          color:"#f0ad4e"
+        }
+      }
+      >
+        {snackBarText}
+      </Snackbar>
+      <AwesomeAlert
+          show={showAwesomeAlert}
+          showProgress={false}
+          title="Sorry"
+          message="The Product is out of Stock."
+          closeOnTouchOutside={false}
+          closeOnHardwareBackPress={false}
+          showCancelButton={true}
+          showConfirmButton={true}
+          cancelText="Cancel"
+          confirmText="Notify Me"
+          confirmButtonColor="#DD6B55"
+          onCancelPressed={() => {
+            setShowAwesomeAlert(false)
+          }}
+          onConfirmPressed={() => {
+            setShowAwesomeAlert(false)
+          }}
+        />
 
     </View>
   );
