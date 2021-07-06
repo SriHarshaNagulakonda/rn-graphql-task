@@ -13,11 +13,12 @@ import gql from "graphql-tag";
 import ProductItem from "../components/ProductItem";
 import Colors from "../constants/Colors";
 import { Entypo } from "@expo/vector-icons";
-import { EvilIcons } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from "@expo/vector-icons";
 import { Snackbar } from "react-native-paper";
 import Counter from "react-native-counters";
 
+var total_price = 0;
 
 const FETCH_PRODUCTS = gql`
   query {
@@ -63,7 +64,7 @@ const Home = () => {
   const [reRenderProducts, setReRenderProducts] = useState(false);
   const [cartProducts, setCartProducts] = useState([]);
   const [productQuantity, setProductQuantity] = useState({});
-
+  const [totalPrice, setTotalPrice] = useState();
 
 
   var products = [];
@@ -85,11 +86,12 @@ const Home = () => {
               console.log(products[key]["id"],'id')
               cart_products.push(products[key])
               product_quantity[products[key]["id"]] = 1
+              total_price+=products[key]["price"]
           }
         }
         setCartProducts(cart_products)
-        console.log(product_quantity)
         setProductQuantity(product_quantity)
+        setTotalPrice(total_price)
         // setCartItems(user_cart);
     } else {
       
@@ -109,7 +111,6 @@ const Home = () => {
   }
 
   if (!loading) {
-    console.log(loading, "loading");
     products = data.get_products_delta.products;
     // products = [products[5]];
   }
@@ -157,6 +158,18 @@ Home.navigationOptions = (navData) => {
       headerStyle: {
         backgroundColor: Colors.primary,
       },  
+      headerRight: (
+        <AntDesign name="check" 
+          size={40}
+          color="white"
+          onPress={() => {
+            
+            navData.navigation.navigate('CheckOut',{total_price: total_price})
+
+          }}
+      />
+      ),
+
     };
 }
 

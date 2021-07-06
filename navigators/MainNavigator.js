@@ -1,6 +1,7 @@
 import LoginScreen from '../screens/Login'
 import HomeScreen from '../screens/Home'
 import Colors from "../constants/Colors";
+import CheckOutScreen from '../screens/CheckOut'
 
 import {
     createSwitchNavigator,
@@ -14,6 +15,7 @@ const AuthNavigator = createStackNavigator(
       // Login: LoginScreen,
       Home: HomeScreen,
       Cart: CartScreen,
+      CheckOut: CheckOutScreen,
     },
     {
         backgroundColor:Colors.primary,
