@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet, Text, View, FlatList,Button,  TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, FlatList,Button, AsyncStorage, TouchableOpacity } from 'react-native'
 import Colors from "../constants/Colors";
 
 function Card (props) {
@@ -40,7 +40,7 @@ function dateToYMD(date) {
 
 
 const CheckOut = (props) => {
-    // const total_price = props.navigation.getParam('total_price')
+    const total_price = props.navigation.getParam('total_price')
     const day1 = new Date();
     var day2 = new Date();
     day2.setDate(day2.getDate()+1);
@@ -104,8 +104,30 @@ const CheckOut = (props) => {
             />
         </View>
         <View style={styles.bottomBar}>
-            <Button style={styles.bottomButton} title="Checkout"
-                color={Colors.red}
+            <Button style={styles.bottomButton} title={"Pay $"+total_price.toFixed(2)}
+                color={Colors.red}   
+                onPress={async () => {
+                    const session = await AsyncStorage.getItem("user_object");
+                    const sessionObj = JSON.parse(session);
+                    if (sessionObj) {
+                        const { verify_otp } = sessionObj.data;
+                        const { id } = verify_otp;
+                        console.log(id,'user id');
+                    }
+                    const product_quantity = await AsyncStorage.getItem("product_quantity");
+                    console.log(product_quantity,'product quantity');
+                    console.log(total_price.toFixed(2),'total price');
+                    var today = new Date();
+                    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                    var dateTime = date+' '+time;
+                    console.log(dateTime,'now');
+                    console.log(selected.item,'date selected')
+                    console.log(timeSelected.item,'time selected')
+                    
+
+                }}
+
             />
         </View>
         </>
@@ -141,6 +163,8 @@ const styles = StyleSheet.create({
     bottomButton:{
         padding: 200,
         margin: 20,
-        height: '100%'
+        height: '100%',
+        width: '100%',
+        fontSize: 30,
     }
 })

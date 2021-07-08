@@ -17,6 +17,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from "@expo/vector-icons";
 import { Snackbar } from "react-native-paper";
 import Counter from "react-native-counters";
+// import Counter from '../components/Counter'
 
 var total_price = 0;
 
@@ -77,6 +78,7 @@ const Home = () => {
 
   const fetchCart = async () => {
     var user_cart = await AsyncStorage.getItem("initial_cart");
+    // console.log(user_cart)
     var product_quantity = {}
     if (user_cart) {
         user_cart = JSON.parse(user_cart);
@@ -85,10 +87,17 @@ const Home = () => {
           if(user_cart[products[key]["id"]]==1) {
               console.log(products[key]["id"],'id')
               cart_products.push(products[key])
-              product_quantity[products[key]["id"]] = 1
+              product_quantity[products[key]["id"]] = user_cart[products[key]["id"]]
               total_price+=products[key]["price"]
           }
         }
+        var async_product_quantity = await AsyncStorage.getItem("product_quantity");
+        if(async_product_quantity){
+          console.log(async_product_quantity, 'async_product_quantity')
+          product_quantity = JSON.parse(async_product_quantity);
+          console.log(product_quantity, 'product_quantity')
+        }
+
         setCartProducts(cart_products)
         setProductQuantity(product_quantity)
         setTotalPrice(total_price)
@@ -102,8 +111,22 @@ const Home = () => {
   useEffect(() => {
       console.log('cart opened')
     fetchCart();
-    console.log(productQuantity)
+    // console.log(productQuantity)
   }, []);
+
+  useEffect(() => {
+    total_price = 0;
+    // console.log(products,'product ky')
+    if(products.length!=0){
+      for(key in productQuantity){
+        var product = products.filter(product => product.id === key)[0]
+        total_price+= product['price'] * productQuantity[key];
+      }
+    }
+    setTotalPrice(total_price);
+    console.log(total_price,'total_price')
+},[productQuantity]);
+
 
   if (loading) {
     console.log(loading, "loading");
@@ -138,9 +161,14 @@ const Home = () => {
               // selectItemHandler(itemData.item.id, itemData.item.title);
             }}
           >
-            <Counter start={1} min={1} max={itemData.item.max_qty}
+            <Counter start={productQuantity[itemData.item.id]} min={1} max={itemData.item.max_qty}  id={itemData.item.id}
               onChange={(value) => {
                 setProductQuantity({...productQuantity, [itemData.item.id]:value})
+                AsyncStorage.setItem(
+                  "product_quantity",
+                  JSON.stringify({...productQuantity, [itemData.item.id]:value})
+                );
+                
               }} />
           </ProductItem>
         )}
@@ -159,7 +187,7 @@ Home.navigationOptions = (navData) => {
         backgroundColor: Colors.primary,
       },  
       headerRight: (
-        <AntDesign name="check" 
+        <AntDesign name="check"
           size={40}
           color="white"
           onPress={() => {

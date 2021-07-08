@@ -106,12 +106,12 @@ const Home = () => {
   }, [loading]);
 
   useEffect(() => {
-    // console.log('updating the async')
-    AsyncStorage.setItem(
-      "initial_cart",
-      JSON.stringify(cartItems)
-    );
-},[cartItems]);
+      // console.log('updating the async')
+      AsyncStorage.setItem(
+        "initial_cart",
+        JSON.stringify(cartItems)
+      );
+  },[cartItems]);
 
 
   if (loading) {
