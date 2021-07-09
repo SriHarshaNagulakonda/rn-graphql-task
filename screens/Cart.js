@@ -58,7 +58,7 @@ const FETCH_PRODUCTS = gql`
   }
 `;
 
-const Home = () => {
+const Home = (props) => {
   const { loading, error, data } = useQuery(FETCH_PRODUCTS, {});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [cartItems, setCartItems] = useState({});
@@ -108,11 +108,16 @@ const Home = () => {
     setReRenderProducts(!reRenderProducts)
   };
 
-  useEffect(() => {
-      console.log('cart opened')
+  // useEffect(() => {
+  //     console.log('cart opened')
+  //   fetchCart();
+  //   // console.log(productQuantity)
+  // }, []);
+
+  props.navigation.addListener('didFocus', () => {
     fetchCart();
-    // console.log(productQuantity)
-  }, []);
+  });
+
 
   useEffect(() => {
     total_price = 0;

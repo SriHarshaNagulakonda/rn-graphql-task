@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet, Text, View, FlatList,Button, AsyncStorage, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, FlatList,Button, AsyncStorage, TouchableOpacity, ActivityIndicator } from 'react-native'
 import Colors from "../constants/Colors";
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 function Card (props) {
       const { selected, onPress } = props
@@ -57,6 +58,9 @@ const CheckOut = (props) => {
     const [time, setTime] = useState(['Home,\n 7:00 - 21:00','Office,\n 6:00 - 15:00'])
     const [selected,setSelected] = useState(null)
     const [timeSelected, setTimeSelected] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [showAwesomeAlert, setShowAwesomeAlert] = useState(false);
+    const [showErrorAlert, setShowErrorAlert] = useState(false);
 
     return (
         <>
@@ -104,16 +108,21 @@ const CheckOut = (props) => {
             />
         </View>
         <View style={styles.bottomBar}>
-            <Button style={styles.bottomButton} title={"Pay $"+total_price.toFixed(2)}
+        {loading
+                ? <ActivityIndicator size="large" color={Colors.red} />
+            :<Button style={styles.bottomButton} title={"Pay $"+total_price.toFixed(2)}
                 color={Colors.red}   
                 onPress={async () => {
+                    if(!selected || !timeSelected){
+                        setShowErrorAlert(true);
+                        return;
+                    }
+                    setLoading(true);
                     const session = await AsyncStorage.getItem("user_object");
                     const sessionObj = JSON.parse(session);
-                    if (sessionObj) {
-                        const { verify_otp } = sessionObj.data;
-                        const { id } = verify_otp;
-                        console.log(id,'user id');
-                    }
+                    const { verify_otp } = sessionObj.data;
+                    const { id } = verify_otp;
+                    console.log(id,'user id');
                     const product_quantity = await AsyncStorage.getItem("product_quantity");
                     console.log(product_quantity,'product quantity');
                     console.log(total_price.toFixed(2),'total price');
@@ -124,11 +133,78 @@ const CheckOut = (props) => {
                     console.log(dateTime,'now');
                     console.log(selected.item,'date selected')
                     console.log(timeSelected.item,'time selected')
-                    
+                    var selected_date = selected.item
+                    var selected_time = timeSelected.item
+                    var price = total_price.toFixed(2)
+                    const response = await fetch(
+                        `https://rn-task-a7fc4-default-rtdb.firebaseio.com/orders.json`,
+                        {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json'
+                          },
+                          body: JSON.stringify({
+                            id,
+                            product_quantity,
+                            price,
+                            dateTime,
+                            selected_date,
+                            selected_time
+                          })
+                        }
+                      );
+                  
+                      const resData = await response.json();
+                      console.log(resData,'response')
+                      setTimeout(() => {
+                          setLoading(false);
+                          AsyncStorage.setItem(
+                            "product_quantity",
+                            JSON.stringify({})
+                          );
+                          AsyncStorage.setItem(
+                            "initial_cart",
+                            JSON.stringify({})
+                          );
+                          setShowAwesomeAlert(true);
+                      },1000)
 
                 }}
 
             />
+            }
+            <AwesomeAlert
+                show={showAwesomeAlert}
+                showProgress={false}
+                title="SUCCESS"
+                message="Order Placed Successfully"
+                closeOnTouchOutside={false}
+                closeOnHardwareBackPress={false}
+                showCancelButton={false}
+                showConfirmButton={true}
+                confirmText="OKAY"
+                confirmButtonColor="#00b382"
+                onConfirmPressed={() => {
+                    setShowAwesomeAlert(false)
+                    props.navigation.navigate('Home');
+                }}
+            />
+            <AwesomeAlert
+                show={showErrorAlert}
+                showProgress={false}
+                title="Error"
+                message="Select Delivery Date and Time"
+                closeOnTouchOutside={false}
+                closeOnHardwareBackPress={false}
+                showCancelButton={false}
+                showConfirmButton={true}
+                confirmText="OKAY"
+                confirmButtonColor="#DD6B55"
+                onConfirmPressed={() => {
+                    setShowErrorAlert(false)
+                }}
+            />
+
         </View>
         </>
     )

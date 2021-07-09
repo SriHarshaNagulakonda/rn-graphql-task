@@ -56,7 +56,7 @@ const FETCH_PRODUCTS = gql`
   }
 `;
 
-const Home = () => {
+const Home = (props) => {
   const { loading, error, data } = useQuery(FETCH_PRODUCTS, {});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [cartItems, setCartItems] = useState({});
@@ -99,6 +99,9 @@ const Home = () => {
     }
   };
 
+  props.navigation.addListener('didFocus', () => {
+    fetchCart();
+  });
 
 
   useEffect(() => {
