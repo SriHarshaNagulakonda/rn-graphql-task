@@ -124,18 +124,17 @@ const CheckOut = (props) => {
                     const { id } = verify_otp;
                     console.log(id,'user id');
                     const product_quantity = await AsyncStorage.getItem("product_quantity");
-                    console.log(product_quantity,'product quantity');
-                    console.log(total_price.toFixed(2),'total price');
+
                     var today = new Date();
                     var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
                     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                     var dateTime = date+' '+time;
-                    console.log(dateTime,'now');
-                    console.log(selected.item,'date selected')
-                    console.log(timeSelected.item,'time selected')
+
                     var selected_date = selected.item
                     var selected_time = timeSelected.item
                     var price = total_price.toFixed(2)
+                    var user_id = id;
+                    
                     const response = await fetch(
                         `https://rn-task-a7fc4-default-rtdb.firebaseio.com/orders.json`,
                         {
@@ -144,7 +143,7 @@ const CheckOut = (props) => {
                             'Content-Type': 'application/json'
                           },
                           body: JSON.stringify({
-                            id,
+                            user_id,
                             product_quantity,
                             price,
                             dateTime,
